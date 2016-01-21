@@ -10,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +26,8 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Console;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         ActivityCompat.OnRequestPermissionsResultCallback {
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      * @see #onRequestPermissionsResult(int, String[], int[])
      */
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private static final String TAG = "MainActivity";
 
     /**
      * Flag indicating whether a requested permission has been denied after returning in
@@ -101,13 +105,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public void onStart() {
+    protected void onStart() {
         googleApiClient.connect();
         super.onStart();
     }
 
     @Override
-    public void onStop() {
+    protected void onStop() {
         googleApiClient.disconnect();
         super.onStop();
     }
@@ -118,10 +122,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
-            //uiSettings.setMyLocationButtonEnabled(false);
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(currentLatitude, currentLongitude)).zoom(16).build();
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            uiSettings = googleMap.getUiSettings();
+            uiSettings.setMyLocationButtonEnabled(false);
         } else {
             // Show rationale and request permission.
         }
@@ -137,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 currentLatitude = currentLocation.getLatitude();
                 currentLongitude = currentLocation.getLongitude();
             }
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLatitude, currentLongitude), 17));
         }
     }
 

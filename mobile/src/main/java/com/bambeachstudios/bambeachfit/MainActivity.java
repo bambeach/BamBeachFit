@@ -2,12 +2,15 @@ package com.bambeachstudios.bambeachfit;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -46,6 +49,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     private boolean mPermissionDenied = false;
 
+    private DrawerLayout navigationDrawer;
+    private ActionBarDrawerToggle drawerToggle;
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
     private UiSettings uiSettings;
@@ -53,12 +58,31 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private double currentLatitude;
     private double currentLongitude;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        navigationDrawer = (DrawerLayout) findViewById(R.id.main_drawer_layout);
+        drawerToggle = new ActionBarDrawerToggle(this, navigationDrawer, toolbar,
+                R.string.drawer_open, R.string.drawer_close) {
+            public void onDrawerClosed(View view){
+                super.onDrawerClosed(view);
+            }
+
+            public void onDrawerOpened(View view){
+                super.onDrawerOpened(view);
+            }
+
+        };
+
+        navigationDrawer.setDrawerListener(drawerToggle);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -80,6 +104,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .addApi(LocationServices.API)
                     .build();
         }
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override

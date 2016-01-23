@@ -12,6 +12,8 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -49,12 +51,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
      */
     private boolean mPermissionDenied = false;
 
-    private DrawerLayout navigationDrawer;
     private ActionBarDrawerToggle drawerToggle;
+    private DrawerLayout navigationDrawer;
     private GoogleMap googleMap;
     private GoogleApiClient googleApiClient;
-    private UiSettings uiSettings;
     private Location currentLocation;
+    private RecyclerView recyclerView;
+    private RecyclerView.Adapter recyclerViewAdapter;
+    private RecyclerView.LayoutManager layoutManager;
+    private Toolbar toolbar;
+    private UiSettings uiSettings;
+
     private double currentLatitude;
     private double currentLongitude;
 
@@ -63,11 +70,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
+        if (getSupportActionBar() != null){
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setHomeButtonEnabled(true);
+        }
 
         navigationDrawer = (DrawerLayout) findViewById(R.id.main_drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(this, navigationDrawer, toolbar,
@@ -83,6 +92,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         };
 
         navigationDrawer.setDrawerListener(drawerToggle);
+
+        /*recyclerView = (RecyclerView) findViewById(R.id.navigation_drawer_left);
+        recyclerView.setHasFixedSize(true);
+        recyclerViewAdapter = new DrawerAdapter();
+        recyclerView.setAdapter(recyclerViewAdapter);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);*/
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

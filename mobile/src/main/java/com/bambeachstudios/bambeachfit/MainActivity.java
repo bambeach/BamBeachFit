@@ -1,6 +1,7 @@
 package com.bambeachstudios.bambeachfit;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Location;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private RecyclerView.LayoutManager layoutManager;
     private Toolbar toolbar;
     private UiSettings uiSettings;
+    private Button startButton;
 
     private double currentLatitude;
     private double currentLongitude;
@@ -77,6 +80,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setHomeButtonEnabled(true);
         }
+
+        startButton = (Button) findViewById(R.id.start_activity_button);
+        startButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), WorkoutTrackingActivity.class);
+                startActivity(intent);
+            }
+        });
 
         navigationDrawer = (DrawerLayout) findViewById(R.id.main_drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(this, navigationDrawer, toolbar,

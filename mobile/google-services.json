@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_id": "effortless-city-119103",
+    "project_number": "48098282491",
+    "name": "BamBeachFit"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:48098282491:android:1f3713b5835078db",
+        "client_id": "android:com.bambeachstudios.bambeachfit",
+        "client_type": 1,
+        "android_client_info": {
+          "package_name": "com.bambeachstudios.bambeachfit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "48098282491-elug7pmeio3sfs3j2sgek9g1rnqmlap5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bambeachstudios.bambeachfit",
+            "certificate_hash": "BBFB029AE73B6065D02C7D158FC93E96C19F01E1"
+          }
+        }
+      ],
+      "api_key": [],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-72685949-1"
+          }
+        },
+        "cloud_messaging_service": {
+          "status": 1,
+          "apns_config": []
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "google_signin_service": {
+          "status": 2
+        },
+        "ads_service": {
+          "status": 2,
+          "test_banner_ad_unit_id": "ca-app-pub-3940256099942544/6300978111",
+          "test_interstitial_ad_unit_id": "ca-app-pub-3940256099942544/1033173712"
+        }
+      }
+    }
+  ],
+  "client_info": [],
+  "ARTIFACT_VERSION": "1"
+}

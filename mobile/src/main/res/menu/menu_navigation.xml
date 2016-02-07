@@ -6,10 +6,10 @@
 
     <group>
         <item
-            android:icon="@drawable/common_google_signin_btn_icon_dark"
+            android:icon="@mipmap/ic_face_black_24dp"
             android:title="Me" />
 
-        <item android:icon="@drawable/common_google_signin_btn_icon_dark"
+        <item android:icon="@mipmap/ic_history_black_24dp"
             android:title="History"/>
     </group>
 

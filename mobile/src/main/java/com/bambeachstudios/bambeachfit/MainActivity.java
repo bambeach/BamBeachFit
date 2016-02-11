@@ -105,13 +105,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         navigationDrawer.setDrawerListener(drawerToggle);
 
-        /*recyclerView = (RecyclerView) findViewById(R.id.navigation_drawer_left);
-        recyclerView.setHasFixedSize(true);
-        recyclerViewAdapter = new DrawerAdapter();
-        recyclerView.setAdapter(recyclerViewAdapter);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);*/
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override

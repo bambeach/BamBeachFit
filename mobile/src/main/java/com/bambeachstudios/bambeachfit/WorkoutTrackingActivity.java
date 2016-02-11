@@ -1,16 +1,32 @@
 package com.bambeachstudios.bambeachfit;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class WorkoutTrackingActivity extends AppCompatActivity {
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+
+import java.text.Format;
+
+public class WorkoutTrackingActivity extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        ActivityCompat.OnRequestPermissionsResultCallback, LocationListener{
 
     private long startTime;
     private long timeBuffer;
@@ -22,6 +38,13 @@ public class WorkoutTrackingActivity extends AppCompatActivity {
     private Handler handler;
     private Button endWorkoutButton;
     private Button pauseWorkoutButton;
+
+    private float workoutDistance;
+    private double currentLatitude;
+    private double currentLongitude;
+    private Location currentLocation;
+    private GoogleApiClient googleApiClient;
+    private LocationRequest locationRequest;
 
     private final Runnable updateTimeTask = new Runnable() {
         public void run() {
@@ -86,5 +109,88 @@ public class WorkoutTrackingActivity extends AppCompatActivity {
 
             }
         });
+
+        // Create an instance of GoogleAPIClient.
+        if (googleApiClient == null) {
+            googleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        googleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        googleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopLocationUpdates();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (googleApiClient.isConnected()){
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationRequest = new LocationRequest();
+            locationRequest.setInterval(2000);
+            locationRequest.setFastestInterval(1000);
+            locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            startLocationUpdates();
+            if (currentLocation != null){
+                currentLatitude = currentLocation.getLatitude();
+                currentLongitude = currentLocation.getLongitude();
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (currentLocation != null){
+            Location lastLocation = currentLocation;
+            currentLocation = location;
+            workoutDistance += lastLocation.distanceTo(currentLocation);
+            totalDistance.setText(Float.toString(workoutDistance));
+        }
+        else {
+            currentLocation = location;
+        }
+    }
+
+    protected void startLocationUpdates() {
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient,
+                locationRequest, this);
+    }
+
+    protected void stopLocationUpdates() {
+        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
     }
 }

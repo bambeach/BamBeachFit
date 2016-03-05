@@ -7,11 +7,12 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,30 +22,37 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.LatLng;
 
-import java.text.Format;
+public class WorkoutTrackingActivity extends AppCompatActivity
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+                   ActivityCompat.OnRequestPermissionsResultCallback, LocationListener, OnMapReadyCallback {
 
-public class WorkoutTrackingActivity extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        ActivityCompat.OnRequestPermissionsResultCallback, LocationListener{
-
-    private long startTime;
-    private long timeBuffer;
-    private long milliseconds;
-    private long workoutTime;
+    private Button endWorkoutButton;
+    private Button pauseWorkoutButton;
+    private GoogleApiClient googleApiClient;
+    private GoogleMap googleMap;
+    private Handler handler;
+    private Location currentLocation;
+    private LocationRequest locationRequest;
     private TextView totalTime;
     private TextView totalDistance;
     private TextView averagePace;
-    private Handler handler;
-    private Button endWorkoutButton;
-    private Button pauseWorkoutButton;
+    private UiSettings uiSettings;
 
-    private float workoutDistance;
     private double currentLatitude;
     private double currentLongitude;
-    private Location currentLocation;
-    private GoogleApiClient googleApiClient;
-    private LocationRequest locationRequest;
+    private float currentSpeed;
+    private float workoutDistance;
+    private long milliseconds;
+    private long startTime;
+    private long timeBuffer;
+    private long workoutTime;
 
     private final Runnable updateTimeTask = new Runnable() {
         public void run() {
@@ -57,12 +65,19 @@ public class WorkoutTrackingActivity extends AppCompatActivity implements
             seconds = seconds % 60;
             minutes = minutes % 60;
 
-            totalTime.setText(getString(R.string.workout_time, hours, minutes, seconds));
+            if (hours > 0) {
+                totalTime.setText(
+                        getString(R.string.workout_time_with_hours, hours, minutes, seconds));
+            }
+            else {
+                totalTime.setText(
+                        getString(R.string.workout_time_without_hours, minutes, seconds));
+            }
+
 
             handler.postDelayed(this, 100);
         }
     };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +90,27 @@ public class WorkoutTrackingActivity extends AppCompatActivity implements
         averagePace = (TextView) findViewById(R.id.mile_pace);
         endWorkoutButton = (Button) findViewById(R.id.end_workout_button);
         pauseWorkoutButton = (Button) findViewById(R.id.pause_workout_button);
+
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) findViewById(R.id.workout_tracking_container);
+        View bottomSheet = coordinatorLayout.findViewById(R.id.workout_bottom_sheet);
+        BottomSheetBehavior behavior = BottomSheetBehavior.from(bottomSheet);
+        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(View bottomSheet, int newState) {
+
+            }
+
+            @Override
+            public void onSlide(View bottomSheet, float slideOffset) {
+
+            }
+        });
+
+        behavior.setPeekHeight(800);
+
+        MapFragment googleMapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        googleMapFrag.getMapAsync(this);
+
         handler = new Handler();
         if (startTime == 0L) {
             startTime = SystemClock.uptimeMillis();
@@ -99,12 +135,14 @@ public class WorkoutTrackingActivity extends AppCompatActivity implements
                     timeAtPause = workoutTime;
                     handler.removeCallbacks(updateTimeTask);
                     pauseWorkoutButton.setText(R.string.resume_workout);
+                    //stopLocationUpdates();
                 }
                 else {
                     timeBuffer = (SystemClock.uptimeMillis() - startTime) - timeAtPause;
                     pauseWorkoutButton.setText(R.string.pause_workout);
                     handler.removeCallbacks(updateTimeTask);
                     handler.postDelayed(updateTimeTask, 100);
+                    //startLocationUpdates();
                 }
 
             }
@@ -121,25 +159,28 @@ public class WorkoutTrackingActivity extends AppCompatActivity implements
     }
 
     @Override
-    protected void onStart() {
+    public void onBackPressed() {
+    }
+
+    @Override
+    public void onStart() {
         googleApiClient.connect();
         super.onStart();
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         googleApiClient.disconnect();
         super.onStop();
     }
 
     @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
-        stopLocationUpdates();
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (googleApiClient.isConnected()){
             startLocationUpdates();
@@ -154,11 +195,16 @@ public class WorkoutTrackingActivity extends AppCompatActivity implements
             locationRequest.setInterval(2000);
             locationRequest.setFastestInterval(1000);
             locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+            currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
             startLocationUpdates();
+
             if (currentLocation != null){
                 currentLatitude = currentLocation.getLatitude();
                 currentLongitude = currentLocation.getLongitude();
             }
+
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(currentLatitude, currentLongitude), 20));
         }
     }
 
@@ -178,7 +224,15 @@ public class WorkoutTrackingActivity extends AppCompatActivity implements
             Location lastLocation = currentLocation;
             currentLocation = location;
             workoutDistance += lastLocation.distanceTo(currentLocation);
-            totalDistance.setText(Float.toString(workoutDistance));
+            currentSpeed = lastLocation.getSpeed();
+            double distance = metersToMiles(workoutDistance);
+            double pace = metersPerSecondToMPH(currentSpeed);
+            double avgPace = calculateAveragePace((float) distance, workoutTime);
+            int paceMinutes = (int)Math.floor(avgPace);//int)avgPace % 60;
+            int paceSeconds = (int)((avgPace - paceMinutes) * 60);
+            totalDistance.setText(String.format("%.2f", distance));
+            //averagePace.setText(String.format("%.2f", pace));
+            averagePace.setText(getString(R.string.average_pace, paceMinutes, paceSeconds));
         }
         else {
             currentLocation = location;
@@ -192,5 +246,33 @@ public class WorkoutTrackingActivity extends AppCompatActivity implements
 
     protected void stopLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+    }
+
+    protected double metersToMiles(float distanceInMeters) {
+        return distanceInMeters * .000621371;
+    }
+
+    protected double metersPerSecondToMPH(float speedInMetersPerSecond) {
+        return speedInMetersPerSecond * 2.23694;
+    }
+
+    protected double calculateAveragePace (float totalDistance, float workoutTimeInMilliseconds) {
+        int seconds = (int) (workoutTimeInMilliseconds / 1000);
+        double secondsPerMile = seconds / totalDistance;
+        double minutesPerMile = secondsPerMile / 60;
+        return minutesPerMile;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        googleMap = map;
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
+            uiSettings = googleMap.getUiSettings();
+            uiSettings.setMyLocationButtonEnabled(false);
+        } else {
+            // Show rationale and request permission.
+        }
     }
 }

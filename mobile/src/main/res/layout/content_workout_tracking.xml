@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/workout_bottom_sheet"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    android:layout_height="500dp"
+    android:background="#FFFFFFFF"
+    app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
+    app:behavior_hideable="false"
     tools:context="com.bambeachstudios.bambeachfit.WorkoutTrackingActivity"
     tools:showIn="@layout/activity_workout_tracking">
 
@@ -23,17 +23,62 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            style="@style/Base.TextAppearance.AppCompat.Display3" />
+            style="@style/Base.TextAppearance.AppCompat.Display4" />
 
         <TextView
-            android:id="@+id/total_distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:id="@+id/workout_time_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/label_total_workout_time"/>
 
-        <TextView
-            android:id="@+id/mile_pace"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/total_distance"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                style="@style/Base.TextAppearance.AppCompat.Display2"/>
+
+            <TextView
+                android:id="@+id/mile_pace"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                style="@style/Base.TextAppearance.AppCompat.Display2"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/content_padding"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/total_distance_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:text="@string/label_total_distance"/>
+
+            <TextView
+                android:id="@+id/mile_pace_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:text="@string/label_average_pace"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -41,21 +86,25 @@
         android:id="@+id/button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true">
+        android:layout_gravity="bottom|center"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/end_workout_button"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/button_padding"
             android:text="@string/end_workout" />
 
         <Button
             android:id="@+id/pause_workout_button"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="@dimen/button_padding"
             android:text="@string/pause_workout" />
 
     </LinearLayout>
 
-</RelativeLayout>
+</FrameLayout>

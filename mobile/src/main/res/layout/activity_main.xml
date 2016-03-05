@@ -45,7 +45,7 @@
             android:layout_margin="@dimen/fab_margin"
             android:padding="@dimen/button_padding"
             android:background="?attr/colorAccent"
-            app:theme="@style/Widget.AppCompat.ActionButton"/>
+            android:theme="@style/Widget.AppCompat.ActionButton"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab"

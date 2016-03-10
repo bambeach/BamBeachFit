@@ -106,7 +106,7 @@ public class WorkoutTrackingActivity extends AppCompatActivity
             }
         });
 
-        behavior.setPeekHeight(800);
+        behavior.setPeekHeight(200);
 
         MapFragment googleMapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         googleMapFrag.getMapAsync(this);
@@ -123,6 +123,8 @@ public class WorkoutTrackingActivity extends AppCompatActivity
             public void onClick(View v) {
                 handler.removeCallbacks(updateTimeTask);
                 Intent intent = new Intent(getApplicationContext(), WorkoutDetailsActivity.class);
+                intent.putExtra("time", workoutTime);
+                intent.putExtra("distance", workoutDistance);
                 startActivity(intent);
             }
         });
@@ -135,14 +137,14 @@ public class WorkoutTrackingActivity extends AppCompatActivity
                     timeAtPause = workoutTime;
                     handler.removeCallbacks(updateTimeTask);
                     pauseWorkoutButton.setText(R.string.resume_workout);
-                    //stopLocationUpdates();
+                    stopLocationUpdates();
                 }
                 else {
                     timeBuffer = (SystemClock.uptimeMillis() - startTime) - timeAtPause;
                     pauseWorkoutButton.setText(R.string.pause_workout);
                     handler.removeCallbacks(updateTimeTask);
                     handler.postDelayed(updateTimeTask, 100);
-                    //startLocationUpdates();
+                    startLocationUpdates();
                 }
 
             }
@@ -226,7 +228,7 @@ public class WorkoutTrackingActivity extends AppCompatActivity
             workoutDistance += lastLocation.distanceTo(currentLocation);
             currentSpeed = lastLocation.getSpeed();
             double distance = metersToMiles(workoutDistance);
-            double pace = metersPerSecondToMPH(currentSpeed);
+            double speed = metersPerSecondToMPH(currentSpeed);
             double avgPace = calculateAveragePace((float) distance, workoutTime);
             int paceMinutes = (int)Math.floor(avgPace);//int)avgPace % 60;
             int paceSeconds = (int)((avgPace - paceMinutes) * 60);

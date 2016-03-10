@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/workout_bottom_sheet"
     android:layout_width="match_parent"
-    android:layout_height="500dp"
+    android:layout_height="75dp"
     android:background="#FFFFFFFF"
     app:layout_behavior="android.support.design.widget.BottomSheetBehavior"
     app:behavior_hideable="false"
@@ -13,80 +13,10 @@
     tools:showIn="@layout/activity_workout_tracking">
 
     <LinearLayout
-        android:id="@+id/workout_stats_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/workout_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            style="@style/Base.TextAppearance.AppCompat.Display4" />
-
-        <TextView
-            android:id="@+id/workout_time_label"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/label_total_workout_time"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/total_distance"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_weight="1"
-                style="@style/Base.TextAppearance.AppCompat.Display2"/>
-
-            <TextView
-                android:id="@+id/mile_pace"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_weight="1"
-                style="@style/Base.TextAppearance.AppCompat.Display2"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="@dimen/content_padding"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/total_distance_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:text="@string/label_total_distance"/>
-
-            <TextView
-                android:id="@+id/mile_pace_label"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_weight="1"
-                android:text="@string/label_average_pace"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
         android:id="@+id/button_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
+        android:layout_gravity="center"
         android:orientation="horizontal">
 
         <Button

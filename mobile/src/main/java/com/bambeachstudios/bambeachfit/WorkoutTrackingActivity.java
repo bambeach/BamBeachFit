@@ -33,6 +33,12 @@ public class WorkoutTrackingActivity extends AppCompatActivity
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
                    ActivityCompat.OnRequestPermissionsResultCallback, LocationListener, OnMapReadyCallback {
 
+    static final String MILLIS = "millis";
+    static final String START_TIME = "startTime";
+    static final String TIME_BUFFER = "timeBuffer";
+    static final String WORKOUT_TIME = "workoutTime";
+    static final String WORKOUT_DISTANCE = "workoutDistance";
+
     private Button endWorkoutButton;
     private Button pauseWorkoutButton;
     private GoogleApiClient googleApiClient;
@@ -81,6 +87,14 @@ public class WorkoutTrackingActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            milliseconds = savedInstanceState.getLong(MILLIS);
+            startTime = savedInstanceState.getLong(START_TIME);
+            timeBuffer = savedInstanceState.getLong(TIME_BUFFER);
+            workoutDistance = savedInstanceState.getFloat(WORKOUT_DISTANCE);
+            workoutTime = savedInstanceState.getLong(WORKOUT_TIME);
+        }
         setContentView(R.layout.activity_workout_tracking);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -179,6 +193,7 @@ public class WorkoutTrackingActivity extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();
+        handler.removeCallbacks(updateTimeTask);
     }
 
     @Override
@@ -187,6 +202,33 @@ public class WorkoutTrackingActivity extends AppCompatActivity
         if (googleApiClient.isConnected()){
             startLocationUpdates();
         }
+        handler.removeCallbacks(updateTimeTask);
+        handler.postDelayed(updateTimeTask, 100);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        handler.removeCallbacks(updateTimeTask);
+        savedInstanceState.putLong(MILLIS, milliseconds);
+        savedInstanceState.putLong(START_TIME, startTime);
+        savedInstanceState.putLong(TIME_BUFFER, timeBuffer);
+        savedInstanceState.putFloat(WORKOUT_DISTANCE, workoutDistance);
+        savedInstanceState.putLong(WORKOUT_TIME, workoutTime);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        milliseconds = savedInstanceState.getLong(MILLIS);
+        startTime = savedInstanceState.getLong(START_TIME);
+        timeBuffer = savedInstanceState.getLong(TIME_BUFFER);
+        workoutDistance = savedInstanceState.getFloat(WORKOUT_DISTANCE);
+        workoutTime = savedInstanceState.getLong(WORKOUT_TIME);
+        handler.removeCallbacks(updateTimeTask);
+        handler.postDelayed(updateTimeTask, 100);
     }
 
     @Override
@@ -261,8 +303,7 @@ public class WorkoutTrackingActivity extends AppCompatActivity
     protected double calculateAveragePace (float totalDistance, float workoutTimeInMilliseconds) {
         int seconds = (int) (workoutTimeInMilliseconds / 1000);
         double secondsPerMile = seconds / totalDistance;
-        double minutesPerMile = secondsPerMile / 60;
-        return minutesPerMile;
+        return secondsPerMile / 60;
     }
 
     @Override
